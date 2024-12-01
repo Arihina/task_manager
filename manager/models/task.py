@@ -1,8 +1,7 @@
-import datetime
 from dataclasses import dataclass, field
 
-from priority import Priority
-from status import Status
+from manager.models.priority import Priority
+from manager.models.status import Status
 
 
 @dataclass
@@ -11,8 +10,8 @@ class Task:
     description: str
     category: str
     priority: Priority
-    due_date: datetime.date
-    status: Status = Status.NOT_COMPLETED
+    due_date: str
+    status: Status = Status.NOT_COMPLETED.value
     id: int = field(init=False)
 
     def __post_init__(self):
