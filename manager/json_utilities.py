@@ -47,7 +47,7 @@ class Writer:
             json.dump(tasks, file, ensure_ascii=False)
 
     @staticmethod
-    def remove_task(id: int | None, category: str | None) -> None:
+    def remove_task_by_id(id: int) -> None:
         try:
             with open(FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -65,4 +65,24 @@ class Writer:
             raise TaskNotFoundError(f'Не найдена задача с id {id}')
 
         with open(FILE_PATH, 'w', encoding='utf-8') as file:
-            json.dump(tasks, file, ensure_ascii=False, indent=4)
+            json.dump(tasks, file, ensure_ascii=False)
+
+    @staticmethod
+    def remove_tasks_by_category(category: str) -> None:
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        f = False
+        for task in tasks:
+            if task['category'] == category:
+                tasks.remove(task)
+                f = True
+
+        if f is False:
+            raise TaskNotFoundError(f'Не найдены задача с категорией {category}')
+
+        with open(FILE_PATH, 'w', encoding='utf-8') as file:
+            json.dump(tasks, file, ensure_ascii=False)
