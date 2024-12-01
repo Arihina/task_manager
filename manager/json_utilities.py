@@ -33,7 +33,7 @@ class Reader:
         return [task for task in tasks if task['category'] == category]
 
     @staticmethod
-    def get_current_tasks():
+    def get_current_tasks() -> list[Task]:
         try:
             with open(FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -41,6 +41,26 @@ class Reader:
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
         return [task for task in tasks if task['status'] == Status.NOT_COMPLETED.value]
+
+    @staticmethod
+    def search_by_title(title: str) -> list[Task]:
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        return [task for task in tasks if title.lower() in task['title'].lower()]
+
+    @staticmethod
+    def search_by_description(description: str) -> list[Task]:
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        return [task for task in tasks if description.lower() in task['description'].lower()]
 
 
 class Writer:
