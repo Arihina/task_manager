@@ -2,6 +2,8 @@ import json
 import os
 
 from manager.exceptions.tasks_exceptions import TaskNotFoundError
+from manager.models.priority import Priority
+from manager.models.status import Status
 from manager.models.task import Task
 
 FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
@@ -29,6 +31,16 @@ class Reader:
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
         return [task for task in tasks if task['category'] == category]
+
+    @staticmethod
+    def get_current_tasks():
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        return [task for task in tasks if task['status'] == Status.NOT_COMPLETED.value]
 
 
 class Writer:
@@ -64,8 +76,11 @@ class Writer:
         if f is False:
             raise TaskNotFoundError(f'Не найдена задача с id {id}')
 
-        with open(FILE_PATH, 'w', encoding='utf-8') as file:
-            json.dump(tasks, file, ensure_ascii=False)
+        try:
+            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+                json.dump(tasks, file, ensure_ascii=False)
+        except IOError as ex:
+            raise IOError('Ошибка при записи в файл tasks.json')
 
     @staticmethod
     def remove_tasks_by_category(category: str) -> None:
