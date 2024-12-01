@@ -16,3 +16,14 @@ class Task:
 
     def __post_init__(self):
         self.id = id(self)
+
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'category': self.category,
+            'priority': self.priority.value,
+            'due_date': self.due_date,
+            'status': self.status.value
+        }
