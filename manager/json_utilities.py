@@ -6,14 +6,18 @@ from manager.models.priority import Priority
 from manager.models.status import Status
 from manager.models.task import Task
 
-FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
-
 
 class Reader:
+    FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
+
+    @staticmethod
+    def set_file_path(path: str):
+        Reader.FILE_PATH = path
+
     @staticmethod
     def get_task_by_id(id: int) -> Task | None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -25,7 +29,7 @@ class Reader:
     @staticmethod
     def get_tasks_by_category(category: str) -> list[Task]:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -35,7 +39,7 @@ class Reader:
     @staticmethod
     def get_current_tasks() -> list[Task]:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -45,7 +49,7 @@ class Reader:
     @staticmethod
     def search_by_title(title: str) -> list[Task]:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -55,7 +59,7 @@ class Reader:
     @staticmethod
     def search_by_description(description: str) -> list[Task]:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -64,24 +68,29 @@ class Reader:
 
 
 class Writer:
+    FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
+
+    @staticmethod
+    def set_file_path(path: str):
+        Reader.FILE_PATH = path
 
     @staticmethod
     def add_task(task: Task) -> None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
         tasks.append(task.to_dict())
 
-        with open(FILE_PATH, 'w', encoding='utf-8') as file:
+        with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
             json.dump(tasks, file, ensure_ascii=False)
 
     @staticmethod
     def remove_task_by_id(id: int) -> None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -97,7 +106,7 @@ class Writer:
             raise TaskNotFoundError(f'Не найдена задача с id {id}')
 
         try:
-            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
                 json.dump(tasks, file, ensure_ascii=False)
         except IOError as ex:
             raise IOError('Ошибка при записи в файл tasks.json')
@@ -105,7 +114,7 @@ class Writer:
     @staticmethod
     def remove_tasks_by_category(category: str) -> None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -120,7 +129,7 @@ class Writer:
             raise TaskNotFoundError(f'Не найдены задача с категорией {category}')
 
         try:
-            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
                 json.dump(tasks, file, ensure_ascii=False)
         except IOError:
             raise IOError('Ошибка при записи в файл tasks.json')
@@ -129,7 +138,7 @@ class Writer:
     def update_task(id: int, title: str | None, description: str | None, category: str | None,
                     priority: Priority | None, due_date: str | None) -> None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -155,7 +164,7 @@ class Writer:
             raise TaskNotFoundError(f'Задача с id {id} не найдена')
 
         try:
-            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
                 json.dump(tasks, file, ensure_ascii=False)
         except IOError as ex:
             raise IOError('Ошибка при записи в файл tasks.json')
@@ -163,7 +172,7 @@ class Writer:
     @staticmethod
     def update_status(id: int) -> None:
         try:
-            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
@@ -180,7 +189,7 @@ class Writer:
             raise TaskNotFoundError(f'Задача с id {id} не найдена')
 
         try:
-            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+            with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
                 json.dump(tasks, file, ensure_ascii=False, indent=4)
         except IOError as ex:
             raise IOError('Ошибка при записи в файл tasks.json')
