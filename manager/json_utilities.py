@@ -99,5 +99,68 @@ class Writer:
         if f is False:
             raise TaskNotFoundError(f'Не найдены задача с категорией {category}')
 
-        with open(FILE_PATH, 'w', encoding='utf-8') as file:
-            json.dump(tasks, file, ensure_ascii=False)
+        try:
+            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+                json.dump(tasks, file, ensure_ascii=False)
+        except IOError:
+            raise IOError('Ошибка при записи в файл tasks.json')
+
+    @staticmethod
+    def update_task(id: int, title: str | None, description: str | None, category: str | None,
+                    priority: Priority | None, due_date: str | None) -> None:
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        f = False
+        for task in tasks:
+            if task['id'] == id:
+                if title is not None:
+                    task['title'] = title
+                if description is not None:
+                    task['description'] = description
+                if category is not None:
+                    task['category'] = category
+                if priority is not None:
+                    task['priority'] = priority.value
+                if due_date is not None:
+                    task['due_date'] = due_date
+
+                f = True
+                break
+
+        if not f:
+            raise TaskNotFoundError(f'Задача с id {id} не найдена')
+
+        try:
+            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+                json.dump(tasks, file, ensure_ascii=False)
+        except IOError as ex:
+            raise IOError('Ошибка при записи в файл tasks.json')
+
+    @staticmethod
+    def update_status(id: int) -> None:
+        try:
+            with open(FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        f = False
+        for task in tasks:
+            if task['id'] == id:
+                task['status'] = Status.COMPLETED.value if task.get(
+                    'status') != Status.COMPLETED.value else Status.NOT_COMPLETED.value
+                f = True
+                break
+
+        if not f:
+            raise TaskNotFoundError(f'Задача с id {id} не найдена')
+
+        try:
+            with open(FILE_PATH, 'w', encoding='utf-8') as file:
+                json.dump(tasks, file, ensure_ascii=False, indent=4)
+        except IOError as ex:
+            raise IOError('Ошибка при записи в файл tasks.json')
