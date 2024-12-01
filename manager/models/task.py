@@ -2,6 +2,7 @@ import datetime
 from dataclasses import dataclass, field
 
 from priority import Priority
+from status import Status
 
 
 @dataclass
@@ -10,13 +11,9 @@ class Task:
     description: str
     category: str
     priority: Priority
-    status: str
     due_date: datetime.date
-    __id: int = field(init=False)
+    status: Status = Status.NOT_COMPLETED
+    id: int = field(init=False)
 
     def __post_init__(self):
-        self.__id = id(self)
-
-    @property
-    def id(self) -> int:
-        return self.__id
+        self.id = id(self)
