@@ -27,3 +27,10 @@ class Task:
             'due_date': self.due_date,
             'status': self.status.value
         }
+
+    def __str__(self):
+        return (f"Задача\n\tid: {self.id}\n\ttitle: {self.title}\n"
+                f"\tdescription: {self.description}\n\tcategory: {self.category}\n"
+                f"\tpriority: {self.priority.value}\n\tdue_date: {self.due_date}\n"
+                f"\tstatus: {self.status.value}\n")
+

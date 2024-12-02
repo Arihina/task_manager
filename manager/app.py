@@ -19,22 +19,19 @@ class ProcessingOutput:
 
     @staticmethod
     def get_by_category() -> None:
-        print('Введите категорию')
-        category = input('-> ').strip()
-
-        if not category:
-            print('Ошибка: категория не может быть пустой')
-            return
+        print('Задачи по категориям')
 
         try:
-            tasks = Reader.get_tasks_by_category(category)
+            tasks = Reader.filter_by_category()
 
             if len(tasks) == 0:
-                print('Нет задач в данной категории')
+                print('Нет задач')
             else:
-                print(f'Задачи в категории {category}')
-                for task in tasks:
-                    print(task)
+                for key, value in tasks.items():
+                    print(f'Категория {key}')
+                    for task in value:
+                        print(task)
+
         except FileNotFoundError as ex:
             print('Ошибка: не найден файл tasks.json в папке resources')
 

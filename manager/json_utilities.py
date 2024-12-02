@@ -7,6 +7,31 @@ from manager.models.status import Status
 from manager.models.task import Task
 
 
+class Loader:
+    @staticmethod
+    def load_task(task_data: dict) -> Task:
+        if task_data['priority'] == 'низкий':
+            priority = Priority.LOW
+        elif task_data['priority'] == 'средний':
+            priority = Priority.MEDIUM
+        else:
+            priority = Priority.HIGH
+
+        if task_data['status'] == 'Выполнена':
+            status = Status.COMPLETED
+        else:
+            status = Status.NOT_COMPLETED
+
+        return Task(
+            title=task_data['title'],
+            description=task_data['description'],
+            category=task_data['category'],
+            priority=priority,
+            due_date=task_data['due_date'],
+            status=status
+        )
+
+
 class Reader:
     FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
 
@@ -34,7 +59,7 @@ class Reader:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        return [task for task in tasks if task['category'] == category]
+        return [Loader.load_task(task) for task in tasks if task['category'] == category]
 
     @staticmethod
     def get_current_tasks() -> list[Task]:
@@ -44,7 +69,7 @@ class Reader:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        return [task for task in tasks if task['status'] == Status.NOT_COMPLETED.value]
+        return [Loader.load_task(task) for task in tasks if task['status'] == Status.NOT_COMPLETED.value]
 
     @staticmethod
     def search_by_title(title: str) -> list[Task]:
@@ -54,7 +79,7 @@ class Reader:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        return [task for task in tasks if title.lower() in task['title'].lower()]
+        return [Loader.load_task(task) for task in tasks if title.lower() in task['title'].lower()]
 
     @staticmethod
     def search_by_description(description: str) -> list[Task]:
@@ -64,7 +89,7 @@ class Reader:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        return [task for task in tasks if description.lower() in task['description'].lower()]
+        return [Loader.load_task(task) for task in tasks if description.lower() in task['description'].lower()]
 
     @staticmethod
     def search_by_category(category: str) -> list[Task]:
@@ -74,7 +99,7 @@ class Reader:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        return [task for task in tasks if category.lower() in task['category'].lower()]
+        return [Loader.load_task(task) for task in tasks if category.lower() in task['category'].lower()]
 
     @staticmethod
     def filter_by_category() -> dict[str, list[Task]]:
@@ -91,7 +116,7 @@ class Reader:
             if category:
                 if category not in filter_tasks:
                     filter_tasks[category] = []
-                filter_tasks[category].append(task)
+                filter_tasks[category].append(Loader.load_task(task))
 
         return filter_tasks
 
