@@ -66,6 +66,35 @@ class Reader:
 
         return [task for task in tasks if description.lower() in task['description'].lower()]
 
+    @staticmethod
+    def search_by_category(category: str) -> list[Task]:
+        try:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        return [task for task in tasks if category.lower() in task['category'].lower()]
+
+    @staticmethod
+    def filter_by_category() -> dict[str, list[Task]]:
+        try:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        filter_tasks = {}
+
+        for task in tasks:
+            category = task.get('category')
+            if category:
+                if category not in filter_tasks:
+                    filter_tasks[category] = []
+                filter_tasks[category].append(task)
+
+        return filter_tasks
+
 
 class Writer:
     FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
