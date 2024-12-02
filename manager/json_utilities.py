@@ -11,7 +11,7 @@ class Reader:
     FILE_PATH = os.path.join(os.path.dirname(__file__), '../resources/tasks.json')
 
     @staticmethod
-    def set_file_path(path: str):
+    def set_file_path(path: str) -> None:
         Reader.FILE_PATH = path
 
     @staticmethod

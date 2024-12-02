@@ -1,22 +1,22 @@
 class ProcessingUserInput:
     @staticmethod
-    def processing_get():
+    def processing_get() -> None:
+        print('Просмотр задач')
+
+    @staticmethod
+    def processing_search() -> None:
         pass
 
     @staticmethod
-    def processing_search():
+    def processing_add() -> None:
         pass
 
     @staticmethod
-    def processing_add():
+    def processing_update() -> None:
         pass
 
     @staticmethod
-    def processing_update():
-        pass
-
-    @staticmethod
-    def processing_delete():
+    def processing_delete() -> None:
         pass
 
 
