@@ -206,18 +206,16 @@ class Writer:
         except (FileNotFoundError, json.JSONDecodeError):
             raise FileNotFoundError('Не найден файл tasks.json в папке resources')
 
-        f = False
-        for task in tasks:
-            if task['category'] == category:
-                tasks.remove(task)
-                f = True
+        filter_tasks = [task for task in tasks if task['category'] != category]
 
-        if f is False:
-            raise TaskNotFoundError(f'Не найдены задача с категорией {category}')
+        if len(filter_tasks) == len(tasks):
+            raise TaskNotFoundError(f'Не найдены задачи с категорией {category}')
 
         try:
             with open(Writer.FILE_PATH, 'w', encoding='utf-8') as file:
-                json.dump(tasks, file, ensure_ascii=False)
+                json.dump(filter_tasks, file, ensure_ascii=False)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
         except IOError:
             raise IOError('Ошибка при записи в файл tasks.json')
 

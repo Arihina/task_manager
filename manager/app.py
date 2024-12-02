@@ -139,6 +139,8 @@ class ProcessingOutput:
             print('Ошибка: не найден файл tasks.json в папке resources')
         except TaskNotFoundError as ex:
             print(f'Ошибка: не найдена задача с id {id}')
+        except IOError as ex:
+            print('Ошибка: ошибка при записи в файл tasks.json')
 
     @staticmethod
     def update_task() -> None:
@@ -185,10 +187,57 @@ class ProcessingOutput:
         try:
             Writer.update_task(id, title, description, category, priority, due_date)
             print('Задача успешно обновлена')
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
             print('Ошибка: не найден файл tasks.json в папке resources')
-        except TaskNotFoundError as e:
+        except TaskNotFoundError as ex:
             print(f'Ошибка: не найдена задача с id {id}')
+        except IOError as ex:
+            print('Ошибка: ошибка при записи в файл tasks.json')
+
+    @staticmethod
+    def delete_by_id() -> None:
+        print('Введите id задачи')
+        id = input('-> ').strip()
+
+        try:
+            id = int(id)
+            if id <= 0:
+                print('Ошибка: id должен быть целым числом больше 0')
+                return
+        except ValueError as ex:
+            print('Ошибка: id должен быть целым числом')
+            return
+
+        try:
+            Writer.remove_task_by_id(id)
+            print('Задача успешно удалена')
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+        except TaskNotFoundError as ex:
+            print(f'Ошибка: не найдена задача с id {id}')
+        except IOError as ex:
+            print('Ошибка: ошибка при записи в файл tasks.json')
+
+    @staticmethod
+    def delete_by_category() -> None:
+        print('Введите категорию')
+        print('Внимание: будут удалены ВСЕ задачи из введённое категории')
+
+        category = input('-> ').strip()
+
+        if not category:
+            print('Ошибка: категория не может быть пустой')
+            return
+
+        try:
+            Writer.remove_tasks_by_category(category)
+            print(f'Задачи из категории {category} успешно удалены')
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+        except TaskNotFoundError as ex:
+            print(f'Ошибка: не найдены задача с категорией {category}')
+        except IOError as ex:
+            print('Ошибка: ошибка при записи в файл tasks.json')
 
 
 class ProcessingUserInput:
@@ -206,6 +255,11 @@ class ProcessingUserInput:
     UPDATE_MENU = {
         '1': ProcessingOutput.update_task,
         '2': ProcessingOutput.update_status
+    }
+
+    DELETE_MENU = {
+        '1': ProcessingOutput.delete_by_id,
+        '2': ProcessingOutput.delete_by_category
     }
 
     @staticmethod
@@ -319,6 +373,7 @@ class ProcessingUserInput:
     @staticmethod
     def processing_update() -> None:
         print('Редактировать задачу')
+
         print('(1) Редактировать существующую')
         print('(2) Отметить выполненной')
 
@@ -330,7 +385,16 @@ class ProcessingUserInput:
 
     @staticmethod
     def processing_delete() -> None:
-        pass
+        print('Удалить задачу')
+
+        print('(1) По id')
+        print('(2) По категории')
+
+        choice = input('-> ')
+        try:
+            ProcessingUserInput.DELETE_MENU[choice]()
+        except KeyError as ex:
+            print('Ошибка: неверный пункт меню')
 
 
 class App:
