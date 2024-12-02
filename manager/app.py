@@ -1,4 +1,9 @@
-from manager.json_utilities import Reader
+import re
+from datetime import datetime
+
+from manager.json_utilities import Reader, Writer
+from manager.models.priority import Priority
+from manager.models.task import Task
 
 
 class ProcessingOutput:
@@ -126,6 +131,31 @@ class ProcessingUserInput:
     }
 
     @staticmethod
+    def is_valid_date(date_str: str) -> bool:
+        pattern = r'^\d{4}-\d{2}-\d{2}$'
+        if not re.match(pattern, date_str):
+            print("Ошибка: дата должна быть в формате 'год-месяц-день'")
+            return False
+
+        year, month, day = map(int, date_str.split('-'))
+
+        if year <= 0 or month <= 0 or day <= 0:
+            print("Ошибка: год, месяц и день должны быть целыми числами больше 0")
+            return False
+
+        if month < 1 or month > 12:
+            print("Ошибка: месяц должен быть в диапазоне от 1 до 12")
+            return False
+
+        try:
+            datetime(year, month, day)
+        except ValueError:
+            print("Ошибка: некорректная дата")
+            return False
+
+        return True
+
+    @staticmethod
     def processing_get() -> None:
         print('Просмотр задач')
 
@@ -154,7 +184,58 @@ class ProcessingUserInput:
 
     @staticmethod
     def processing_add() -> None:
-        pass
+        print('Добавить задачу')
+
+        title = input('Введите название -> ').strip()
+        if not title:
+            print('Ошибка: название не может быть пустым')
+            return
+
+        description = input('Введите описание -> ').strip()
+        if not description:
+            print('Ошибка: описание не может быть пустым')
+            return
+
+        category = input('Введите категорию -> ').strip()
+        if not category:
+            print('Ошибка: категория не может быть пустой')
+            return
+
+        due_date = input('Введите дату -> ').strip()
+        if not due_date:
+            print('Ошибка: дата не может быть пустой')
+            return
+        if not ProcessingUserInput.is_valid_date(due_date):
+            return
+
+        print('Выберите приоритет')
+        print('(1) Низкий')
+        print('(2) Средний')
+        print('(3) Высокий')
+
+        priority = input('-> ').strip()
+        if not priority:
+            print('Ошибка: приоритет не может быть пустым')
+            return
+        try:
+            if int(priority) < 1 or int(priority) > 3:
+                print('Ошибка: приоритет должен указываться числом 1 или 3')
+                return
+        except ValueError as ex:
+            print('Ошибка: приоритет должен указываться числом 1 или 3')
+            return
+
+        if priority == '1':
+            priority = Priority.LOW
+        elif priority == '2':
+            priority = Priority.MEDIUM
+        else:
+            priority = Priority.HIGH
+
+        try:
+            Writer.add_task(Task(title, description, category, priority, due_date))
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
 
     @staticmethod
     def processing_update() -> None:

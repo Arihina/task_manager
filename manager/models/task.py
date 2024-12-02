@@ -11,7 +11,7 @@ class Task:
     category: str
     priority: Priority
     due_date: str
-    status: Status = Status.NOT_COMPLETED.value
+    status: Status = Status.NOT_COMPLETED
     id: int = field(init=False)
 
     def __post_init__(self):
