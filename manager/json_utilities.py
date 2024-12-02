@@ -102,6 +102,23 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if category.lower() in task['category'].lower()]
 
     @staticmethod
+    def search_key_word(word: str) -> list[Task]:
+        try:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        filter_tasks = []
+
+        for task in tasks:
+            if word.lower() in task['title'].lower() or word.lower() in task['description'].lower() or word.lower() in \
+                    task['category'].lower():
+                filter_tasks.append(Loader.load_task(task))
+
+        return filter_tasks
+
+    @staticmethod
     def filter_by_category() -> dict[str, list[Task]]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
@@ -119,6 +136,21 @@ class Reader:
                 filter_tasks[category].append(Loader.load_task(task))
 
         return filter_tasks
+
+    @staticmethod
+    def search_by_status(status: int) -> list[Task]:
+        if status == 1:
+            status = Status.COMPLETED.value
+        else:
+            status = Status.NOT_COMPLETED.value
+
+        try:
+            with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
+                tasks = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            raise FileNotFoundError('Не найден файл tasks.json в папке resources')
+
+        return [Loader.load_task(task) for task in tasks if status == task['status']]
 
 
 class Writer:
