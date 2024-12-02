@@ -1,7 +1,62 @@
+from manager.json_utilities import Reader
+
+
+class ProcessingOutput:
+    @staticmethod
+    def get_current() -> None:
+        try:
+            tasks = Reader.get_current_tasks()
+
+            if len(tasks) == 0:
+                print('Нет текущих задач')
+            else:
+                print('Текущие задачи')
+                for task in tasks:
+                    print(task)
+
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+
+    @staticmethod
+    def get_by_category() -> None:
+        print('Введите категорию')
+        category = input('-> ').strip()
+
+        if not category:
+            print('Ошибка: категория не может быть пустой')
+            return
+
+        try:
+            tasks = Reader.get_tasks_by_category(category)
+
+            if len(tasks) == 0:
+                print('Нет задач в данной категории')
+            else:
+                print(f'Задачи в категории {category}')
+                for task in tasks:
+                    print(task)
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+
+
 class ProcessingUserInput:
+    GET_MENU = {
+        '1': ProcessingOutput.get_current,
+        '2': ProcessingOutput.get_by_category
+    }
+
     @staticmethod
     def processing_get() -> None:
         print('Просмотр задач')
+
+        print("(1) Просмотр текущих")
+        print("(2) Просмотр по категориям")
+
+        choice = input('-> ')
+        try:
+            ProcessingUserInput.GET_MENU[choice]()
+        except KeyError as ex:
+            print('Ошибка: неверный пункт меню')
 
     @staticmethod
     def processing_search() -> None:
@@ -53,4 +108,4 @@ class App:
             try:
                 App.MENU[choice]()
             except KeyError as ex:
-                print('Неверный пункт меню')
+                print('Ошибка: неверный пункт меню')
