@@ -6,11 +6,11 @@ from manager.json_utilities import Reader
 
 test_tasks = [
     {"id": 1, "title": "Тестовая задача 1", "description": "Описание задачи 1", "category": "Работа",
-     "status": "Не выполнена", "priority": "высокий"},
+     "status": "Не выполнена", "priority": "высокий", "due_date": "2004-12-12"},
     {"id": 2, "title": "Тестовая задача 2", "description": "Описание задачи 2", "category": "Личное",
-     "status": "Выполнена", "priority": "высокий"},
+     "status": "Выполнена", "priority": "высокий", "due_date": "2004-12-12"},
     {"id": 3, "title": "Тестовая задача 3", "description": "Описание задачи 3", "category": "Работа",
-     "status": "Не выполнена", "priority": "высокий"},
+     "status": "Не выполнена", "priority": "высокий", "due_date": "2004-12-12"},
 ]
 
 
