@@ -34,3 +34,13 @@ class Task:
                 f"\tpriority: {self.priority.value}\n\tdue_date: {self.due_date}\n"
                 f"\tstatus: {self.status.value}\n")
 
+
+@dataclass
+class OutputTask:
+    title: str
+    description: str
+    category: str
+    priority: Priority
+    due_date: str
+    status: Status
+    id: int

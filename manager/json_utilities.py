@@ -4,12 +4,12 @@ import os
 from manager.exceptions.tasks_exceptions import TaskNotFoundError
 from manager.models.priority import Priority
 from manager.models.status import Status
-from manager.models.task import Task
+from manager.models.task import Task, OutputTask
 
 
 class Loader:
     @staticmethod
-    def load_task(task_data: dict) -> Task:
+    def load_task(task_data: dict) -> OutputTask:
         if task_data['priority'] == 'низкий':
             priority = Priority.LOW
         elif task_data['priority'] == 'средний':
@@ -22,13 +22,14 @@ class Loader:
         else:
             status = Status.NOT_COMPLETED
 
-        return Task(
+        return OutputTask(
             title=task_data['title'],
             description=task_data['description'],
             category=task_data['category'],
             priority=priority,
             due_date=task_data['due_date'],
-            status=status
+            status=status,
+            id=task_data['id']
         )
 
 
@@ -52,7 +53,7 @@ class Reader:
                 return task
 
     @staticmethod
-    def get_tasks_by_category(category: str) -> list[Task]:
+    def get_tasks_by_category(category: str) -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -62,7 +63,7 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if task['category'] == category]
 
     @staticmethod
-    def get_current_tasks() -> list[Task]:
+    def get_current_tasks() -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -72,7 +73,7 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if task['status'] == Status.NOT_COMPLETED.value]
 
     @staticmethod
-    def search_by_title(title: str) -> list[Task]:
+    def search_by_title(title: str) -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -82,7 +83,7 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if title.lower() in task['title'].lower()]
 
     @staticmethod
-    def search_by_description(description: str) -> list[Task]:
+    def search_by_description(description: str) -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -92,7 +93,7 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if description.lower() in task['description'].lower()]
 
     @staticmethod
-    def search_by_category(category: str) -> list[Task]:
+    def search_by_category(category: str) -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -102,7 +103,7 @@ class Reader:
         return [Loader.load_task(task) for task in tasks if category.lower() in task['category'].lower()]
 
     @staticmethod
-    def search_key_word(word: str) -> list[Task]:
+    def search_key_word(word: str) -> list[OutputTask]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -119,7 +120,7 @@ class Reader:
         return filter_tasks
 
     @staticmethod
-    def filter_by_category() -> dict[str, list[Task]]:
+    def filter_by_category() -> dict[str, list[OutputTask]]:
         try:
             with open(Reader.FILE_PATH, 'r', encoding='utf-8') as file:
                 tasks = json.load(file)
@@ -138,7 +139,7 @@ class Reader:
         return filter_tasks
 
     @staticmethod
-    def search_by_status(status: int) -> list[Task]:
+    def search_by_status(status: int) -> list[OutputTask]:
         if status == 1:
             status = Status.COMPLETED.value
         else:
