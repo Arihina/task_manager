@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 
+from manager.exceptions.tasks_exceptions import TaskNotFoundError
 from manager.json_utilities import Reader, Writer
 from manager.models.priority import Priority
 from manager.models.task import Task
@@ -117,6 +118,78 @@ class ProcessingOutput:
         except FileNotFoundError as ex:
             print('Ошибка: не найден файл tasks.json в папке resources')
 
+    @staticmethod
+    def update_status() -> None:
+        print('Введите id задачи')
+        id = input('-> ').strip()
+
+        try:
+            id = int(id)
+            if id <= 0:
+                print('Ошибка: id должен быть целым числом больше 0')
+                return
+        except ValueError as ex:
+            print('Ошибка: id должен быть целым числом')
+            return
+
+        try:
+            Writer.update_status(id)
+            print('Задача успешно обновлена')
+        except FileNotFoundError as ex:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+        except TaskNotFoundError as ex:
+            print(f'Ошибка: не найдена задача с id {id}')
+
+    @staticmethod
+    def update_task() -> None:
+        print('Введите id задачи')
+        id = input('-> ').strip()
+
+        try:
+            id = int(id)
+            if id <= 0:
+                print('Ошибка: id должен быть целым числом больше 0')
+                return
+        except ValueError as ex:
+            print('Ошибка: id должен быть целым числом')
+            return
+
+        title = input('Введите новое название (или нажмите Enter, чтобы оставить без изменений) -> ').strip() or None
+        description = input(
+            'Введите новое описание (или нажмите Enter, чтобы оставить без изменений) -> ').strip() or None
+        category = input(
+            'Введите новую категорию (или нажмите Enter, чтобы оставить без изменений) -> ').strip() or None
+        due_date = input('Введите новую дату (или нажмите Enter, чтобы оставить без изменений) -> ').strip() or None
+
+        if due_date and not ProcessingUserInput.is_valid_date(due_date):
+            return
+
+        print('Выберите новый приоритет (или нажмите Enter, чтобы оставить без изменений)')
+        print('(1) Низкий')
+        print('(2) Средний')
+        print('(3) Высокий')
+
+        priority_input = input('-> ').strip()
+        priority = None
+        if priority_input:
+            try:
+                if int(priority_input) < 1 or int(priority_input) > 3:
+                    print('Ошибка: приоритет должен указываться числом 1, 2 или 3')
+                    return
+                priority = Priority.LOW if priority_input == '1' else Priority.MEDIUM \
+                    if priority_input == '2' else Priority.HIGH
+            except ValueError as ex:
+                print('Ошибка: приоритет должен указываться числом 1, 2 или 3')
+                return
+
+        try:
+            Writer.update_task(id, title, description, category, priority, due_date)
+            print('Задача успешно обновлена')
+        except FileNotFoundError:
+            print('Ошибка: не найден файл tasks.json в папке resources')
+        except TaskNotFoundError as e:
+            print(f'Ошибка: не найдена задача с id {id}')
+
 
 class ProcessingUserInput:
     GET_MENU = {
@@ -128,6 +201,11 @@ class ProcessingUserInput:
         '1': ProcessingOutput.search_by_category,
         '2': ProcessingOutput.search_by_status,
         '3': ProcessingOutput.search_by_key_word
+    }
+
+    UPDATE_MENU = {
+        '1': ProcessingOutput.update_task,
+        '2': ProcessingOutput.update_status
     }
 
     @staticmethod
@@ -234,12 +312,21 @@ class ProcessingUserInput:
 
         try:
             Writer.add_task(Task(title, description, category, priority, due_date))
+            print('Задача успешно добавлена')
         except FileNotFoundError as ex:
             print('Ошибка: не найден файл tasks.json в папке resources')
 
     @staticmethod
     def processing_update() -> None:
-        pass
+        print('Редактировать задачу')
+        print('(1) Редактировать существующую')
+        print('(2) Отметить выполненной')
+
+        choice = input('-> ')
+        try:
+            ProcessingUserInput.UPDATE_MENU[choice]()
+        except KeyError as ex:
+            print('Ошибка: неверный пункт меню')
 
     @staticmethod
     def processing_delete() -> None:
